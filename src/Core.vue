@@ -1,28 +1,24 @@
 <template>
   <div class="w-full h-full">
-    <!--<component v-for="appConfig in runningList" :key="appConfig.name" :is="appConfig.name"/>-->
-    <Desktop/>
-    <!--<Cmd/>-->
+    <AppBox v-for="appConfig in runningList" :key="appConfig.name" :appConfig="appConfig"/>
   </div>
 </template>
 
 <script lang="ts">
-import Cmd from "@/apps/cmd/Cmd.vue"
 
 import {Component, Vue} from "vue-property-decorator"
 import {namespace} from "vuex-class"
 import {AppConfig} from "@/types/App"
-import Desktop from "@/apps/desktop/Desktop.vue"
+import AppBox from "@/components/appBox/AppBox.vue"
+
 
 const CoreModule = namespace("core")
 
 @Component({
-  components: {Desktop, Cmd}
+  components: {AppBox}
 })
 export default class Core extends Vue {
   @CoreModule.State("runningList") runningList !: AppConfig[]
-
-  @CoreModule.Action("bootstrap") bootstrap!: (appName: string) => void
 
 
 }

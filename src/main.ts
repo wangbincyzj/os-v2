@@ -8,6 +8,7 @@ import {Core} from "@/types/Core"
 
 Vue.config.productionTip = false
 
+window.isDev = process.env.NODE_ENV === "development"
 Vue.use(ElementUI, {size: "mini"})
 Vue.prototype.$core = new Core()
 
