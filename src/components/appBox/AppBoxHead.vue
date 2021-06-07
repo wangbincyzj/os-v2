@@ -4,8 +4,8 @@
       <WIcon :name="appConfig.iconName" class="mr-2"/>
       <div>{{ appConfig.name }}</div>
     </div>
-    <div class="flex items-center  h-full">
-      <div class="wrapper h-8 w-8 hover:bg-red-600 hover:text-white flex items-center justify-center" @click.stop="minimizeApp">
+    <div class="flex items-center  h-full" @click.stop>
+      <div class="wrapper h-8 w-8 hover:bg-red-300  flex items-center justify-center" @click.stop="minimizeApp">
         <WIcon name="icon-zuixiaohua"/>
       </div>
       <div class="wrapper h-8 w-8 hover:bg-red-300 flex items-center justify-center" @click.stop="toggleSize">
@@ -24,13 +24,17 @@ import {Component, Inject, Prop, Vue} from "vue-property-decorator"
 import {AppConfig} from "@/types/App"
 import WIcon from "@/components/wIcon/WIcon.vue"
 
+
 function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
-  let x0, y0, left0, top0
-  dom.onmousedown = ev => {
+  let x0: number, y0: number, left0: number, top0: number
+  dom.onmousedown = (ev: MouseEvent) => {
+    if(ev.target !== dom){
+      return
+    }
     x0 = ev.x
     y0 = ev.y
-    left0 = parseInt(appConfig.windowMode.left)
-    top0 = parseInt(appConfig.windowMode.top)
+    left0 = parseInt(appConfig.windowMode.left as string)
+    top0 = parseInt(appConfig.windowMode.top as string)
     window.addEventListener("mousemove", handleMoseMove)
   }
 
@@ -38,7 +42,7 @@ function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
     window.removeEventListener("mousemove", handleMoseMove)
   }
 
-  const handleMoseMove = ev => {
+  const handleMoseMove = (ev: MouseEvent) => {
     let deltaX = ev.x - x0
     let deltaY = ev.y - y0
     appConfig.windowMode.left = left0 + deltaX + "px"
@@ -52,9 +56,9 @@ function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
 export default class Computer extends Vue {
   @Prop() appConfig!: AppConfig
 
-  @Inject() closeApp: () => void
-  @Inject() toggleSize: () => void
-  @Inject() minimizeApp: () => void
+  @Inject() closeApp!: () => void
+  @Inject() toggleSize!: () => void
+  @Inject() minimizeApp!: () => void
 
   mounted(): void {
     createMovableBox(this.$refs.head as any, this.appConfig)

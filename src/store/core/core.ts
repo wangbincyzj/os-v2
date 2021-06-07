@@ -16,8 +16,8 @@ const coreModule: Module<coreState, any> = {
     runningList: []
   },
   getters: {
-    highestApp: state => {
-      return state.runningList.filter(app => !app.windowMode.isMinimize)
+    highestApp: () => (app: AppConfig) => {
+      return app.zIndex === zIndex$1 - 1 && !app.windowMode.isMinimize
     }
   },
   actions: {
@@ -36,6 +36,15 @@ const coreModule: Module<coreState, any> = {
       // @ts-ignore
       if (runningApp && runningApp.zIndex >= 3) {
         runningApp.zIndex = zIndex$1++
+        runningApp.windowMode.isMinimize = false
+      }
+    },
+
+    minimize({state}, appName) {
+      const runningApp = state.runningList.find(item => item.name === appName)
+      if(runningApp){
+        runningApp.zIndex = -1
+        runningApp.windowMode.isMinimize = true
       }
     },
 

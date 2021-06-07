@@ -7,7 +7,8 @@ import computerConfig from "@/apps/computer/computer.config"
 export enum EmitEventType {
   "OPEN_APP" = "openApp",
   "CLOSE_APP" = "closeApp",
-  "TOP_WINDOW" = "topWindow"
+  "TOP_WINDOW" = "topWindow",
+  "MINIMIZE_WINDOW" = "minimizeWindow"
 }
 
 export enum SysEventType {
@@ -75,6 +76,8 @@ class EmitEventHandler {
           return this.ok(store.dispatch("core/closeApp", payload))
         case EmitEventType.TOP_WINDOW:
           return this.ok(store.dispatch("core/top", payload))
+        case EmitEventType.MINIMIZE_WINDOW:
+          return this.ok(store.dispatch("core/minimize", payload))
         default:
           return this.err("命令未找到")
       }

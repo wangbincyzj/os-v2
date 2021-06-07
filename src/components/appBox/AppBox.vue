@@ -1,5 +1,5 @@
 <template>
-  <div class="appBox flex flex-col" :style="boxStyle" @click.capture="topApp">
+  <div class="appBox flex flex-col" :style="boxStyle" @mousedown="topApp">
     <AppBoxHead v-if="appConfig.windowMode.appHead" :appConfig="appConfig"/>
     <component :is="appConfig.name" :appConfig="appConfig"/>
   </div>
@@ -37,7 +37,6 @@ export default class AppBox extends Vue {
   }
 
   @Provide() topApp = ():void => {
-    console.log(111)
     this.$core.emit(EmitEventType.TOP_WINDOW, this.appConfig.name)
   }
 
