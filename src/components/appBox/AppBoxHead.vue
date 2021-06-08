@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-blue-100 flex pl-2 h-8 items-center justify-between select-none text-sm" ref="head" @dblclick="toggleSize">
+  <div class="w-full bg-blue-100 flex pl-2 h-8 items-center  justify-between  text-sm" ref="head" @dblclick="toggleSize">
     <div class="flex items-center">
       <WIcon :name="appConfig.iconName" class="mr-2"/>
       <div>{{ appConfig.name }}</div>
@@ -27,7 +27,7 @@ import WIcon from "@/components/wIcon/WIcon.vue"
 
 function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
   let x0: number, y0: number, left0: number, top0: number
-  dom.onmousedown = (ev: MouseEvent) => {
+  dom.addEventListener("mousedown", (ev: MouseEvent) => {
     if(ev.target !== dom){
       return
     }
@@ -36,11 +36,11 @@ function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
     left0 = parseInt(appConfig.windowMode.left as string)
     top0 = parseInt(appConfig.windowMode.top as string)
     window.addEventListener("mousemove", handleMoseMove)
-  }
+  })
 
-  window.onmouseup = () => {
+  window.addEventListener("mouseup", () => {
     window.removeEventListener("mousemove", handleMoseMove)
-  }
+  })
 
   const handleMoseMove = (ev: MouseEvent) => {
     let deltaX = ev.x - x0

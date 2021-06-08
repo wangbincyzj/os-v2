@@ -1,7 +1,8 @@
 <template>
-  <div class="appBox flex flex-col" :style="boxStyle" @mousedown="topApp">
+  <div class="appBox flex flex-col relative" :style="boxStyle" @mousedown="topApp">
     <AppBoxHead v-if="appConfig.windowMode.appHead" :appConfig="appConfig"/>
     <component :is="appConfig.name" :appConfig="appConfig"/>
+    <AppBoxResize :appConfig="appConfig"/>
   </div>
 </template>
 
@@ -15,9 +16,13 @@ import {AppConfig} from "@/types/App"
 import Computer from "@/apps/computer/Computer.vue"
 import AppBoxHead from "@/components/appBox/AppBoxHead.vue"
 import {EmitEventType} from "@/types/Core"
+import AppBoxResize from "@/components/appBox/AppBoxResize.vue"
+
+
+
 
 @Component({
-  components: {AppBoxHead, Computer, Cmd, Desktop}
+  components: {AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
 })
 export default class AppBox extends Vue {
   @Prop({required: true}) appConfig!: AppConfig
@@ -33,12 +38,14 @@ export default class AppBox extends Vue {
   }
 
   @Provide() minimizeApp = (): void => {
-    this.appConfig.windowMode.isMinimize = true
+    this.$store.dispatch("core/minimize", this.appConfig.name)
   }
 
   @Provide() topApp = ():void => {
     this.$core.emit(EmitEventType.TOP_WINDOW, this.appConfig.name)
   }
+
+
 
   get boxStyle(): any {
     const app = this.appConfig
@@ -78,4 +85,5 @@ export default class AppBox extends Vue {
 </script>
 
 <style scoped lang="scss">
+
 </style>

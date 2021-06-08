@@ -7,6 +7,7 @@
 <script lang="ts">
 import {Component} from "vue-property-decorator"
 import {AppComponent} from "@/types/App"
+import {fileApi} from "@/apps/computer/api"
 
 @Component
 export default class Computer extends AppComponent {
