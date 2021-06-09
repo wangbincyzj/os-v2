@@ -1,8 +1,8 @@
 import {AppConfig} from "@/types/App"
 
-const computerConfig: AppConfig = {
-  name: "computer",
-  iconName: "icon-diannao",
+const textEditorConfig: AppConfig = {
+  name: "textEditor",
+  iconName: "icon-txt",
   windowMode: {
     mode: "FLOAT",
     appHead: true,
@@ -10,7 +10,8 @@ const computerConfig: AppConfig = {
     height: "500px",
     left: "200px",
     top: "100px"
-  }
+  },
+  ext: "txt"
 }
 
-export default computerConfig
+export default textEditorConfig

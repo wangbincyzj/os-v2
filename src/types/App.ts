@@ -20,7 +20,8 @@ export interface AppConfig {
     bottom?: string,
     width?: string,
     height?: string
-  }
+  },
+  ext?: string,
 }
 
 

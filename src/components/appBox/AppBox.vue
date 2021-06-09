@@ -17,12 +17,13 @@ import Computer from "@/apps/computer/Computer.vue"
 import AppBoxHead from "@/components/appBox/AppBoxHead.vue"
 import {EmitEventType} from "@/types/Core"
 import AppBoxResize from "@/components/appBox/AppBoxResize.vue"
+import TextEditor from "@/apps/textEditor/TextEditor.vue"
 
 
 
 
 @Component({
-  components: {AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
+  components: {TextEditor, AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
 })
 export default class AppBox extends Vue {
   @Prop({required: true}) appConfig!: AppConfig
@@ -59,6 +60,7 @@ export default class AppBox extends Vue {
       positionStyle.right = "0"
       if (app.windowMode.mode==="FLOAT_FULL") positionStyle.bottom = "40px"
     } else if (app.windowMode.mode === "FIXED" || app.windowMode.mode === "FLOAT") {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const {mode, ...others} = app.windowMode
       positionStyle.position = "fixed"
       Object.keys(others).forEach(key => {

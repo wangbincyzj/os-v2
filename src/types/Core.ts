@@ -3,12 +3,16 @@ import store from "@/store/index"
 import cmdConfig from "@/apps/cmd/cmd.config"
 import desktopConfig from "@/apps/desktop/desktop.config"
 import computerConfig from "@/apps/computer/computer.config"
+import textEditorConfig from "@/apps/textEditor/textEditor.config"
 
 export enum EmitEventType {
-  "OPEN_APP" = "openApp",
-  "CLOSE_APP" = "closeApp",
-  "TOP_WINDOW" = "topWindow",
-  "MINIMIZE_WINDOW" = "minimizeWindow"
+  OPEN_APP = "openApp",
+  CLOSE_APP = "closeApp",
+  TOP_WINDOW = "topWindow",
+  MINIMIZE_WINDOW = "minimizeWindow",
+  OPEN_CONTEXT = "openContext",
+  CLOSE_CONTEXT = "closeContext",
+  OPEN_FILE = "openFile"
 }
 
 export enum SysEventType {
@@ -27,7 +31,8 @@ export class Core {
     store.dispatch("core/loadAppList", [
       cmdConfig,
       desktopConfig,
-      computerConfig
+      computerConfig,
+      textEditorConfig
     ]).then(() => {
       const autoBoot: AppConfig[] = store.state.core.appList.filter((app: AppConfig) => app.order !== undefined)
       autoBoot.sort((a: any, b: any) => a.order - b.order)
@@ -42,6 +47,7 @@ export class Core {
   }
 
   // 接受apps的事件
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   emit = (eventType: EmitEventType, payload?: any): any => {
     // core响应事件本身
     const ret = this.emitEventHandler.handleEmit(eventType, payload)
@@ -78,6 +84,16 @@ class EmitEventHandler {
           return this.ok(store.dispatch("core/top", payload))
         case EmitEventType.MINIMIZE_WINDOW:
           return this.ok(store.dispatch("core/minimize", payload))
+        case EmitEventType.OPEN_CONTEXT:
+          return this.ok(store.dispatch("context/openContext", {
+            events: payload.events,
+            style: {left: payload.e.x + "px", top: payload.e.y + "px", ...payload.style}
+          }))
+        case EmitEventType.CLOSE_CONTEXT:
+          return this.ok(store.dispatch("context/closeContext"))
+        case EmitEventType.OPEN_FILE:
+          console.log(payload.ext, payload.src)
+          return
         default:
           return this.err("命令未找到")
       }
