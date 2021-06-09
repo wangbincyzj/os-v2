@@ -59,6 +59,7 @@ export default class AppBox extends Vue {
       positionStyle.right = "0"
       if (app.windowMode.mode==="FLOAT_FULL") positionStyle.bottom = "40px"
     } else if (app.windowMode.mode === "FIXED" || app.windowMode.mode === "FLOAT") {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const {mode, ...others} = app.windowMode
       positionStyle.position = "fixed"
       Object.keys(others).forEach(key => {

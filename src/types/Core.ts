@@ -5,10 +5,12 @@ import desktopConfig from "@/apps/desktop/desktop.config"
 import computerConfig from "@/apps/computer/computer.config"
 
 export enum EmitEventType {
-  "OPEN_APP" = "openApp",
-  "CLOSE_APP" = "closeApp",
-  "TOP_WINDOW" = "topWindow",
-  "MINIMIZE_WINDOW" = "minimizeWindow"
+  OPEN_APP = "openApp",
+  CLOSE_APP = "closeApp",
+  TOP_WINDOW = "topWindow",
+  MINIMIZE_WINDOW = "minimizeWindow",
+  OPEN_CONTEXT = "openContext",
+  CLOSE_CONTEXT = "closeContext"
 }
 
 export enum SysEventType {
@@ -42,6 +44,7 @@ export class Core {
   }
 
   // 接受apps的事件
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   emit = (eventType: EmitEventType, payload?: any): any => {
     // core响应事件本身
     const ret = this.emitEventHandler.handleEmit(eventType, payload)
@@ -78,6 +81,13 @@ class EmitEventHandler {
           return this.ok(store.dispatch("core/top", payload))
         case EmitEventType.MINIMIZE_WINDOW:
           return this.ok(store.dispatch("core/minimize", payload))
+        case EmitEventType.OPEN_CONTEXT:
+          return this.ok(store.dispatch("context/openContext", {
+            events: payload.events,
+            style: {left: payload.e.x + "px", top: payload.e.y + "px", ...payload.style}
+          }))
+        case EmitEventType.CLOSE_CONTEXT:
+          return this.ok(store.dispatch("context/closeContext"))
         default:
           return this.err("命令未找到")
       }

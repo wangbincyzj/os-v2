@@ -6,7 +6,7 @@ const computerConfig: AppConfig = {
   windowMode: {
     mode: "FLOAT",
     appHead: true,
-    width: "300px",
+    width: "800px",
     height: "500px",
     left: "200px",
     top: "100px"

@@ -53,7 +53,7 @@ function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
 @Component({
   components: {WIcon}
 })
-export default class Computer extends Vue {
+export default class AppBoxHead extends Vue {
   @Prop() appConfig!: AppConfig
 
   @Inject() closeApp!: () => void

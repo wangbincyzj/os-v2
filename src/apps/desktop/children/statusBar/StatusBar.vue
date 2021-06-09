@@ -30,7 +30,7 @@ const CoreModule = namespace("core")
 })
 export default class StatusBar extends Vue {
   @Prop() runningList!: AppConfig[]
-  @CoreModule.State highestIndex
+  @CoreModule.State highestIndex!: number
 
   get showList(): AppConfig[] {
     return this.runningList.filter(app => !app.hiddenInDesktop)
