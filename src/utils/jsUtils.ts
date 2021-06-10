@@ -9,13 +9,13 @@ export const parseFileName = (str: string): [string, string | null] => {
 export const createTextForm = (content: string, filename: string, file?: any): FormData => {
   const form = new FormData()
   if (typeof file === "string") {
-    form.set("ext", "txt")
     form.set("pid", "4")
   } else {
     Object.keys(file).forEach(key => {
       if (file[key]) form.set(key, file[key])
     })
   }
+  form.set("ext", "txt")
   form.set("icon", "icon-jishiben")
   form.set("file", new File([content], filename, {type: "text/plain"}))
   return form

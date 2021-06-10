@@ -10,7 +10,7 @@
         <WIcon :name="app.iconName" size="40"/>
         <i class="iconfont icon-Windows"/>
       </div>
-      <div class="name">{{ app.name }}</div>
+      <div class="name">{{ app.desktopName||app.name }}</div>
     </div>
   </div>
 </template>

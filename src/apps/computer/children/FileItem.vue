@@ -89,7 +89,7 @@ export default class FileItem extends Vue {
     this.$confirm("确定要删除吗?", {
       type: "warning",
     }).then(()=>{
-      fileApi.delete(this.file.id).then(()=>this.refresh())
+      fileApi.delete(this.file.id as number).then(()=>this.refresh())
     })
   }
 

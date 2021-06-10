@@ -4,9 +4,9 @@ import {Resp, RespList, RespPage} from "@/types/interface/response"
 import {Page} from "@/types/interface/page"
 //import { config } from "@/config/config"
 //import Vue from "vue"
+export const baseUrl =  "http://localhost:10086/domain"
 
-
-axios.defaults.baseURL = "http://localhost:10086/domain"
+axios.defaults.baseURL = baseUrl
 axios.defaults.timeout = 3000
 
 axios.interceptors.response.use(value => {

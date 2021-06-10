@@ -26,7 +26,7 @@ import {File} from "@/types/entity/File"
 import WIcon from "@/components/wIcon/WIcon.vue"
 import FileItem from "@/apps/computer/children/FileItem.vue"
 import {EmitEventType} from "@/types/Core"
-import {parseFileName} from "@/utils/jsUtils"
+import {createTextForm, parseFileName} from "@/utils/jsUtils"
 import {contextEvent} from "@/store/context/context"
 
 export interface Route {
@@ -96,6 +96,12 @@ export default class Computer extends AppComponent implements EventReceiver {
     this.fileList.push(file)
   }
 
+  handleAddText(): void {
+    fileApi.add(createTextForm("", "新建文本文档", {})).then(()=>{
+      this.refresh()
+    })
+  }
+
   handleChooseFile(): void {
     const dom = document.createElement("input")
     dom.type = "file"
@@ -125,7 +131,7 @@ export default class Computer extends AppComponent implements EventReceiver {
         {
           label: "新建", children: [
             {label: "文件夹", handler: () => this.handleAddDir()},
-            {label: "文本文档"},
+            {label: "文本文档", handler: () => this.handleAddText()},
           ]
         }
       ])

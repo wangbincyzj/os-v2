@@ -2,6 +2,7 @@ import Vue from "vue"
 
 export interface AppConfig {
   name: string,
+  desktopName?: string,
   iconName?: string,
   schema?: string,      // 调用协议,没有就用name属性
   zIndex?: number | boolean,

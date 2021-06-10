@@ -1,9 +1,9 @@
 import {AppConfig} from "@/types/App"
 
-const textEditorConfig: AppConfig = {
-  name: "textEditor",
-  desktopName: "文本编辑器",
-  iconName: "icon-txt",
+const imgViewerConfig: AppConfig = {
+  name: "imgViewer",
+  iconName: "icon-tupian1",
+  desktopName: "图片查看",
   windowMode: {
     mode: "FLOAT",
     appHead: true,
@@ -12,7 +12,7 @@ const textEditorConfig: AppConfig = {
     left: "200px",
     top: "100px"
   },
-  ext: ["txt", "md"]
+  ext: ["png","jfif"]
 }
 
-export default textEditorConfig
+export default imgViewerConfig
