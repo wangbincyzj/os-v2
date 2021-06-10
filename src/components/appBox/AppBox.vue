@@ -1,6 +1,6 @@
 <template>
-  <div class="appBox flex flex-col relative" :style="boxStyle" @mousedown="topApp">
-    <AppBoxHead v-if="appConfig.windowMode.appHead" :appConfig="appConfig"/>
+  <div class="appBox flex flex-col relative" :class="[isBoxModel&&'flotBox']" :style="boxStyle" @mousedown="topApp">
+    <AppBoxHead ref="_appHead" v-if="appConfig.windowMode.appHead" :appConfig="appConfig"/>
     <component :is="appConfig.name" :appConfig="appConfig"/>
     <AppBoxResize :appConfig="appConfig"/>
   </div>
@@ -18,8 +18,6 @@ import AppBoxHead from "@/components/appBox/AppBoxHead.vue"
 import {EmitEventType} from "@/types/Core"
 import AppBoxResize from "@/components/appBox/AppBoxResize.vue"
 import TextEditor from "@/apps/textEditor/TextEditor.vue"
-
-
 
 
 @Component({
@@ -46,9 +44,12 @@ export default class AppBox extends Vue {
     this.$core.emit(EmitEventType.TOP_WINDOW, this.appConfig.name)
   }
 
+  private get isBoxModel():boolean {
+    // "FULL" | "FLOAT" | "FLOAT_FULL" | "FIXED"
+    return this.appConfig.windowMode.mode === "FLOAT"
+  }
 
-
-  get boxStyle(): any {
+  private get boxStyle(): any {
     const app = this.appConfig
     // 位置信息
     let positionStyle = {} as any
@@ -87,5 +88,8 @@ export default class AppBox extends Vue {
 </script>
 
 <style scoped lang="scss">
-
+.flotBox{
+  border: 1px solid rgba(0,0,0,0.5);
+  box-shadow: 0 0 10px 1px rgba(0,0,0,0.5);
+}
 </style>

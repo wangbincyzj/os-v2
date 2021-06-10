@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-blue-100 flex pl-2 h-8 items-center  justify-between  text-sm" ref="head" @dblclick="toggleSize">
+  <div class="w-full bg-blue-100 flex pl-2 h-8 items-center  justify-between  text-sm" :style="style" ref="head" @dblclick="toggleSize">
     <div class="flex items-center">
       <WIcon :name="appConfig.iconName" class="mr-2"/>
       <div>{{ appConfig.name }}</div>
@@ -54,11 +54,15 @@ function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
   components: {WIcon}
 })
 export default class AppBoxHead extends Vue {
+  style: any = {}
   @Prop() appConfig!: AppConfig
-
   @Inject() closeApp!: () => void
   @Inject() toggleSize!: () => void
   @Inject() minimizeApp!: () => void
+
+  setStyle(style: any):void {
+    this.style = style
+  }
 
   mounted(): void {
     createMovableBox(this.$refs.head as any, this.appConfig)

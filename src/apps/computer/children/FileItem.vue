@@ -5,7 +5,7 @@
   >
     <WIcon :name="file.icon" size="25"/>
     <div class="name truncate w-full text-center mt-1">
-      <el-input  ref="input" @dblclick.native.stop v-if="file.renaming" v-model="fileName" @keyup.enter.native="handleRenamingEnd"
+      <el-input  ref="input" @dblclick.native.stop v-if="file.renaming" v-model="file.name" @keyup.enter.native="handleRenamingEnd"
                 @blur="handleRenamingEnd"/>
       <span v-else>{{ fileName }}</span>
     </div>
@@ -18,6 +18,7 @@ import {File} from "@/types/entity/File"
 import WIcon from "@/components/wIcon/WIcon.vue"
 import {EmitEventType} from "@/types/Core"
 import {fileApi} from "@/apps/computer/api"
+import {contextEvent} from "@/store/context/context"
 
 @Component({
   components: {WIcon}
@@ -25,6 +26,9 @@ import {fileApi} from "@/apps/computer/api"
 export default class FileItem extends Vue {
   @Prop({required: true}) file!: File
   @Inject() refresh!: () => void
+  public $refs!: {
+    input: any
+  }
 
   get isDir(): boolean {
     return this.file.isDir as boolean
@@ -60,8 +64,10 @@ export default class FileItem extends Vue {
     if (this.isDir) {
       this.$emit("dirClick", this.file)
     } else {
-      console.log(this.file)
-      this.$core.emit(EmitEventType.OPEN_FILE, {src: this.file.src, ext: this.file.ext})
+      let ret = this.$core.emit(EmitEventType.OPEN_FILE, {form: this, ext: this.file.ext, data: this.file})
+      if(ret.code!==0){
+        this.$message.warning(ret.msg)
+      }
     }
   }
 
@@ -89,7 +95,7 @@ export default class FileItem extends Vue {
 
   handleContext(e: MouseEvent): void {
     if(this.file.pid===0) return
-    const events = [
+    const events: contextEvent[] = [
       {label: "打开", handler: () => this.handleFileClick()},
       {label: "重命名", handler: () => {this.$set(this.file, "renaming", true)}},
       {label: "删除", handler: () => this.handleDelete()}

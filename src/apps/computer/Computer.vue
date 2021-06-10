@@ -7,8 +7,8 @@
       @goBack="stack.back()"
       @goForward="stack.forward()"
     />
-    <div class="content flex-1 flex justify-start items-start" v-loading="loading">
-      <FileItem v-for="file in fileList" :key="file.id" :file="file" @dirClick="handleDirClick"/>
+    <div class="content flex-1 flex justify-start items-start content-start flex-wrap" v-loading="loading">
+      <FileItem class="flex-shrink-0" v-for="file in fileList" :key="file.id" :file="file" @dirClick="handleDirClick"/>
     </div>
     <el-dialog :visible.sync="showUpload" append-to-body title="上传文件">
       <el-button @click="handleChooseFile">上传</el-button>
@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import {Component, Provide} from "vue-property-decorator"
-import {AppComponent} from "@/types/App"
+import {AppComponent, AppMsg, EventReceiver} from "@/types/App"
 import {fileApi} from "@/apps/computer/api"
 import NavBar from "@/apps/computer/children/NavBar.vue"
 import {Stack} from "@/utils/stack"
@@ -27,6 +27,7 @@ import WIcon from "@/components/wIcon/WIcon.vue"
 import FileItem from "@/apps/computer/children/FileItem.vue"
 import {EmitEventType} from "@/types/Core"
 import {parseFileName} from "@/utils/jsUtils"
+import {contextEvent} from "@/store/context/context"
 
 export interface Route {
   id: number,
@@ -38,8 +39,9 @@ export interface Route {
 @Component({
   components: {FileItem, WIcon, NavBar}
 })
-export default class Computer extends AppComponent {
-  @Provide() refresh = ():void => this.fetchRouteData()
+export default class Computer extends AppComponent implements EventReceiver {
+
+  @Provide() refresh = (): void => this.fetchRouteData()
 
   stack = new Stack<Route>({
     id: 0,
@@ -83,7 +85,7 @@ export default class Computer extends AppComponent {
     this.showUpload = true
   }
 
-  handleAddDir():void {
+  handleAddDir(): void {
     const file = new File()
     file.isDir = true
     file.pid = this.currentRoute.id
@@ -98,15 +100,15 @@ export default class Computer extends AppComponent {
     const dom = document.createElement("input")
     dom.type = "file"
     dom.onchange = e => {
-      const file = e.target.files[0]
+      const file = (e as any).target.files[0]
       const fileName = file.name
       const [name, ext] = parseFileName(fileName)
       const form = new FormData()
       form.set("name", name)
-      form.set("ext", ext)
+      form.set("ext", ext as string)
       form.set("file", file)
-      form.set("pid", this.currentRoute.id)
-      fileApi.newFile(form as any).then(()=>{
+      form.set("pid", this.currentRoute.id as any)
+      fileApi.newFile(form as any).then(() => {
         this.fetchRouteData()
       })
     }
@@ -114,7 +116,7 @@ export default class Computer extends AppComponent {
   }
 
   handleContext(e: MouseEvent): void {
-    let events = [
+    let events: contextEvent[] = [
       {label: "刷新", handler: () => this.fetchRouteData()},
     ]
     if (this.currentRoute.id !== 0) {
@@ -142,6 +144,10 @@ export default class Computer extends AppComponent {
       this.isTopStack = this.stack.isTopStack
       this.fetchRouteData()
     })
+  }
+
+  onReceiveMsg(msg: AppMsg): void {
+    console.log(msg)
   }
 }
 </script>

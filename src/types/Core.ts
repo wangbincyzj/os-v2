@@ -4,6 +4,7 @@ import cmdConfig from "@/apps/cmd/cmd.config"
 import desktopConfig from "@/apps/desktop/desktop.config"
 import computerConfig from "@/apps/computer/computer.config"
 import textEditorConfig from "@/apps/textEditor/textEditor.config"
+import Vue from "vue"
 
 export enum EmitEventType {
   OPEN_APP = "openApp",
@@ -12,7 +13,9 @@ export enum EmitEventType {
   MINIMIZE_WINDOW = "minimizeWindow",
   OPEN_CONTEXT = "openContext",
   CLOSE_CONTEXT = "closeContext",
-  OPEN_FILE = "openFile"
+  OPEN_FILE = "openFile",
+  REGISTER = "register",
+  SET_STYLE = "setStyle",
 }
 
 export enum SysEventType {
@@ -26,6 +29,7 @@ export class Core {
   private version: string | undefined
   private emitEventHandler: EmitEventHandler
   private eventBus: EventBus
+  private appList: AppConfig[] = []
 
   private loadApps = async (): Promise<void> => {
     store.dispatch("core/loadAppList", [
@@ -61,6 +65,20 @@ export class Core {
     this.eventBus.subscribe(eventType, callback, options)
   }
 
+  setStyle(vm: Vue, style: any): boolean {
+    let ref = null
+    while (vm && !ref) {
+      ref = vm.$refs._appHead
+      vm = vm.$parent
+    }
+    if (ref) {
+      (ref as any).setStyle(style)
+      return true
+    } else {
+      return false
+    }
+  }
+
   constructor() {
     this.startUp()
     this.emitEventHandler = new EmitEventHandler()
@@ -73,7 +91,7 @@ export class Core {
 class EmitEventHandler {
   private ok = (data: any, msg?: string) => ({data, code: 0, msg})
   private err = (msg: string) => ({data: null, code: 1, msg})
-  handleEmit = (eventType: EmitEventType, payload: any): void | any => {
+  handleEmit = (eventType: SubscribeType, payload: any): void | any => {
     try {
       switch (eventType) {
         case EmitEventType.OPEN_APP:
@@ -92,13 +110,31 @@ class EmitEventHandler {
         case EmitEventType.CLOSE_CONTEXT:
           return this.ok(store.dispatch("context/closeContext"))
         case EmitEventType.OPEN_FILE:
-          console.log(payload.ext, payload.src)
-          return
+          return this.handleOpenFile(payload)
+        case EmitEventType.REGISTER:
+          return this.ok(store.dispatch("core/register", payload))
         default:
           return this.err("命令未找到")
       }
     } catch (e) {
       return this.err(e.toString())
+    }
+  }
+
+  private handleOpenFile(payload: any): any {
+    const {ext, from, data} = payload
+    const handler = store.state.core.appList.find((app: AppConfig) => {
+      if (!app.ext) return false
+      if (typeof app.ext === "string") {
+        return app.ext === ext
+      } else if (typeof app.ext === "object") {
+        return app.ext.find(item => item === ext)
+      }
+    })
+    if (handler) {
+      return this.ok(store.dispatch("core/sendMsg", {from, data, to: handler.name}))
+    } else {
+      return this.err("handler not found")
     }
   }
 }

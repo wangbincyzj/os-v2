@@ -1,6 +1,5 @@
 import Vue from "vue"
 
-
 export interface AppConfig {
   name: string,
   iconName?: string,
@@ -21,10 +20,20 @@ export interface AppConfig {
     width?: string,
     height?: string
   },
-  ext?: string,
+  ext?: string| string[],
+  msgQueue?: AppMsg[],
 }
 
 
-export class AppComponent extends Vue{
+export class AppComponent extends Vue {
+}
 
+export interface EventReceiver {
+  onReceiveMsg: (msg: AppMsg) => void
+}
+
+export interface AppMsg {
+  from: AppConfig,
+  to: string,
+  data: any
 }

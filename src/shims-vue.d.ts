@@ -16,5 +16,6 @@ declare global {
 declare module "vue/types/vue" {
   interface Vue {
     $core: Core
+    $refs: { [key: string]: any };
   }
 }

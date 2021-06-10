@@ -1,11 +1,12 @@
 import {Module} from "vuex"
-import {AppConfig} from "@/types/App"
+import {AppConfig, AppMsg, EventReceiver} from "@/types/App"
 import Vue from "vue"
 
 interface coreState {
-  appList: AppConfig[],  // 注册的应用列表
-  runningList: AppConfig[],  // 运行的应用列表
-  highestIndex: number
+  appList: AppConfig[],  // register list
+  runningList: (AppConfig & { vm: Vue & EventReceiver})[],  // when vm mounted, should set its own instance
+  highestIndex: number,
+
 }
 
 let zIndex$1 = 3
@@ -21,7 +22,7 @@ const coreModule: Module<coreState, any> = {
     highestIndex: state => {
       let highestIndex = 0
       state.runningList.forEach(item => {
-        if(item.zIndex as number >= highestIndex) highestIndex = item.zIndex as number
+        if (item.zIndex as number >= highestIndex) highestIndex = item.zIndex as number
       })
       return highestIndex
     }
@@ -38,7 +39,7 @@ const coreModule: Module<coreState, any> = {
     // 置顶窗口
     top({state}, appName) {
       const runningApp = state.runningList.find(item => item.name === appName)
-      if (runningApp && runningApp.name!=='desktop') {
+      if (runningApp && runningApp.name !== "desktop") {
         runningApp.zIndex = zIndex$1++
         runningApp.windowMode.isMinimize = false
         state.highestIndex = runningApp.zIndex
@@ -47,12 +48,12 @@ const coreModule: Module<coreState, any> = {
 
     minimize({state}, appName) {
       const runningApp = state.runningList.find(item => item.name === appName)
-      if(runningApp){
+      if (runningApp) {
         runningApp.zIndex = -1
         runningApp.windowMode.isMinimize = true
         let max = 0
         state.runningList.forEach(app => {
-          if(app.zIndex as number >= max){
+          if (app.zIndex as number >= max) {
             max = app.zIndex as number
           }
         })
@@ -65,15 +66,17 @@ const coreModule: Module<coreState, any> = {
       const app = state.appList.find(item => item.name === appName)
       if (app) {
         const runningApp = state.runningList.find(item => item.name === appName)
-        if (runningApp) {    // 已经启动: index置于最高
+        if (runningApp) {
           dispatch("top", appName)
-        } else {  // 未启动: 启动
-          state.runningList.push(app)
+        } else {
+          state.runningList.push(app as any)
           app.runningTime = 0
-          if(!app.windowMode.isMinimize){
+
+          // check some reactive attr for join reactive system
+          if (!app.windowMode.isMinimize) {
             Vue.set(app.windowMode, "isMinimize", false)
           }
-          if(!app.zIndex){
+          if (!app.zIndex) {
             Vue.set(app, "zIndex", 3)
           }
           dispatch("top", appName)
@@ -94,6 +97,37 @@ const coreModule: Module<coreState, any> = {
         return true
       } else {
         return false
+      }
+    },
+
+    // register vm
+    register({state}, {name, vm}: { name: string, vm: Vue }) {
+      const app = state.runningList.find(item => item.name === name)
+      if (app) {
+        app.vm = vm as any
+      }
+      if(app&&app.vm&&app.msgQueue){
+        app.msgQueue.forEach(msg => {
+          app.vm.onReceiveMsg(msg)
+        })
+        app.msgQueue = undefined
+      }
+    },
+
+    // if their have a existing vm instance then call its directly,otherwise cache the msg waiting for vm startup to call
+    sendMsg({state, dispatch}, msg:AppMsg): void{
+      const app = state.runningList.find(item => item.name === msg.to)
+      if(!app || !app.vm){
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const app = state.appList.find(item => item.name === msg.to)!
+        if(app?.msgQueue){
+          app.msgQueue.push(msg)
+        }else{
+          app.msgQueue = [msg]
+        }
+        dispatch("bootstrap", msg.to)
+      }else{
+        app.vm.onReceiveMsg(msg)
       }
     }
   }

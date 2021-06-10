@@ -1,5 +1,5 @@
 export class File {
-  id  = 0
+  id: string|number  = ""
   name = ""
   ext: string | null = ""
   pid: number | null = null

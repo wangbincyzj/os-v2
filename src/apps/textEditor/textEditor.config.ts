@@ -11,7 +11,7 @@ const textEditorConfig: AppConfig = {
     left: "200px",
     top: "100px"
   },
-  ext: "txt"
+  ext: ["txt", "md"]
 }
 
 export default textEditorConfig
