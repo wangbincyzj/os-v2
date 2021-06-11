@@ -21,7 +21,10 @@ export default class ImgViewer extends Vue implements EventReceiver{
 
 
   fetch(file: File):void {
-    this.src = fileApi.createStream(file.src)
+    fileApi.getUrl(file.src as string).then(ret=>{
+      this.src = ret.msg
+    })
+    // this.src = fileApi.createStream(file.src as string)
   }
 
   mounted():void {

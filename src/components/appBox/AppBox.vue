@@ -19,10 +19,11 @@ import {EmitEventType} from "@/types/Core"
 import AppBoxResize from "@/components/appBox/AppBoxResize.vue"
 import TextEditor from "@/apps/textEditor/TextEditor.vue"
 import ImgViewer from "@/apps/imgViewer/ImgViewer.vue"
+import AudioPlayer from "@/apps/audioPlayer/AudioPlayer.vue"
 
 
 @Component({
-  components: {ImgViewer, TextEditor, AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
+  components: {AudioPlayer, ImgViewer, TextEditor, AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
 })
 export default class AppBox extends Vue {
   @Prop({required: true}) appConfig!: AppConfig

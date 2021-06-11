@@ -12,7 +12,7 @@ const imgViewerConfig: AppConfig = {
     left: "200px",
     top: "100px"
   },
-  ext: ["png","jfif"]
+  ext: ["png","jfif", "jpg"]
 }
 
 export default imgViewerConfig

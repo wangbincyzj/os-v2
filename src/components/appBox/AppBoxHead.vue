@@ -23,32 +23,10 @@
 import {Component, Inject, Prop, Vue} from "vue-property-decorator"
 import {AppConfig} from "@/types/App"
 import WIcon from "@/components/wIcon/WIcon.vue"
+import {createMovableBox} from "@/utils/jsUtils"
 
 
-function createMovableBox(dom: HTMLElement, appConfig: AppConfig): any {
-  let x0: number, y0: number, left0: number, top0: number
-  dom.addEventListener("mousedown", (ev: MouseEvent) => {
-    if(ev.target !== dom){
-      return
-    }
-    x0 = ev.x
-    y0 = ev.y
-    left0 = parseInt(appConfig.windowMode.left as string)
-    top0 = parseInt(appConfig.windowMode.top as string)
-    window.addEventListener("mousemove", handleMoseMove)
-  })
 
-  window.addEventListener("mouseup", () => {
-    window.removeEventListener("mousemove", handleMoseMove)
-  })
-
-  const handleMoseMove = (ev: MouseEvent) => {
-    let deltaX = ev.x - x0
-    let deltaY = ev.y - y0
-    appConfig.windowMode.left = left0 + deltaX + "px"
-    appConfig.windowMode.top = top0 + deltaY + "px"
-  }
-}
 
 @Component({
   components: {WIcon}

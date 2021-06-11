@@ -5,7 +5,9 @@ import desktopConfig from "@/apps/desktop/desktop.config"
 import computerConfig from "@/apps/computer/computer.config"
 import textEditorConfig from "@/apps/textEditor/textEditor.config"
 import ImgViewerConfig from "@/apps/imgViewer/imgViewer.config"
+import audioPlayerConfig from "@/apps/audioPlayer/audioPlayer.config"
 import Vue from "vue"
+
 
 export enum EmitEventType {
   OPEN_APP = "openApp",
@@ -38,7 +40,8 @@ export class Core {
       desktopConfig,
       computerConfig,
       textEditorConfig,
-      ImgViewerConfig
+      ImgViewerConfig,
+      audioPlayerConfig
     ]).then(() => {
       const autoBoot: AppConfig[] = store.state.core.appList.filter((app: AppConfig) => app.order !== undefined)
       autoBoot.sort((a: any, b: any) => a.order - b.order)
