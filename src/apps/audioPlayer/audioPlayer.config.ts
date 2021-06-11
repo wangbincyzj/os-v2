@@ -10,8 +10,8 @@ const audioPlayerConfig: AppConfig = {
     appHead: true,
     width: "800px",
     height: "150px",
-    left: "200px",
-    top: "100px"
+    left: "210px",
+    top: "150px"
   },
   ext: ["m4a"]
 }

@@ -3,7 +3,7 @@ import {RequestArgs} from "@/types/interface/requestArgs"
 import {Resp, RespList, RespPage} from "@/types/interface/response"
 import {Page} from "@/types/interface/page"
 //import { config } from "@/config/config"
-//import Vue from "vue"
+import Vue from "vue"
 export const baseUrl =  "http://10.86.9.180:10086/domain"
 
 axios.defaults.baseURL = baseUrl
@@ -13,12 +13,13 @@ axios.interceptors.response.use(value => {
   const data = value.data
 
   // 这里是数据层报错
-  if (data.code === 999) {
-    //Vue.prototype.$msg.warning(data.msg)
+  if (data.code !== 0) {
+    Vue.prototype.$message.warning(data.msg)
+    throw new Error(data.msg)
   }
   return data
 }, err => {  // 这里是http层报错
-  return {code: 999, msg: err.toString()}
+  throw new Error(err.toString())
 })
 
 axios.interceptors.request.use(value => {

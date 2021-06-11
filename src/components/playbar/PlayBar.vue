@@ -45,7 +45,7 @@ export default class PlayBar extends Vue {
   }
 
   handleBarClick(e: MouseEvent): void {
-    this.rate = e.offsetX / e.target.offsetWidth
+    this.rate = e.offsetX / (e.target as HTMLElement).offsetWidth
     this.$emit("updateRateEnd", this.rate)
   }
 

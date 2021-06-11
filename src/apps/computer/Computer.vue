@@ -97,7 +97,8 @@ export default class Computer extends AppComponent implements EventReceiver {
   }
 
   handleAddText(): void {
-    fileApi.add(createTextForm("", "新建文本文档", {})).then(()=>{
+    // todo
+    fileApi.add(createTextForm("", "新建文本文档", {} as File)).then(()=>{
       this.refresh()
     })
   }

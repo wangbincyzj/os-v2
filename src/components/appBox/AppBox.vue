@@ -2,7 +2,7 @@
   <div class="appBox flex flex-col relative" :class="[isBoxModel&&'flotBox']" :style="boxStyle" @mousedown="topApp">
     <AppBoxHead ref="_appHead" v-if="appConfig.windowMode.appHead" :appConfig="appConfig"/>
     <component :is="appConfig.name" :appConfig="appConfig"/>
-    <AppBoxResize :appConfig="appConfig"/>
+    <AppBoxResize v-if="appConfig.resize" :appConfig="appConfig"/>
   </div>
 </template>
 
@@ -20,10 +20,14 @@ import AppBoxResize from "@/components/appBox/AppBoxResize.vue"
 import TextEditor from "@/apps/textEditor/TextEditor.vue"
 import ImgViewer from "@/apps/imgViewer/ImgViewer.vue"
 import AudioPlayer from "@/apps/audioPlayer/AudioPlayer.vue"
+import YourChat from "@/apps/yourChat/YourChat.vue"
+import UserManage from "@/apps/userManage/UserManage.vue"
 
 
 @Component({
-  components: {AudioPlayer, ImgViewer, TextEditor, AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
+  components: {
+    UserManage,
+    YourChat, AudioPlayer, ImgViewer, TextEditor, AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
 })
 export default class AppBox extends Vue {
   @Prop({required: true}) appConfig!: AppConfig
@@ -31,11 +35,14 @@ export default class AppBox extends Vue {
   @Provide() closeApp = (): void => this.$core.emit(EmitEventType.CLOSE_APP, this.appConfig.name)
 
   @Provide() toggleSize(): void {
-    if (this.appConfig.windowMode.mode === "FLOAT_FULL") {
-      this.appConfig.windowMode.mode = "FLOAT"
-    } else {
-      this.appConfig.windowMode.mode = "FLOAT_FULL"
+    if(this.appConfig.resize){
+      if (this.appConfig.windowMode.mode === "FLOAT_FULL") {
+        this.appConfig.windowMode.mode = "FLOAT"
+      } else {
+        this.appConfig.windowMode.mode = "FLOAT_FULL"
+      }
     }
+
   }
 
   @Provide() minimizeApp = (): void => {

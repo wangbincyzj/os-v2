@@ -8,7 +8,7 @@
       <div class="wrapper h-8 w-8 hover:bg-red-300  flex items-center justify-center" @click.stop="minimizeApp">
         <WIcon name="icon-zuixiaohua"/>
       </div>
-      <div class="wrapper h-8 w-8 hover:bg-red-300 flex items-center justify-center" @click.stop="toggleSize">
+      <div v-if="appConfig.resize" class="wrapper h-8 w-8 hover:bg-red-300 flex items-center justify-center" @click.stop="toggleSize">
         <WIcon name="icon-zuidahua1" v-if="appConfig.windowMode.mode === 'FLOAT_FULL'"/>
         <WIcon name="icon-zuidahua" v-else/>
       </div>
@@ -38,6 +38,7 @@ export default class AppBoxHead extends Vue {
   @Inject() toggleSize!: () => void
   @Inject() minimizeApp!: () => void
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   setStyle(style: any):void {
     this.style = style
   }

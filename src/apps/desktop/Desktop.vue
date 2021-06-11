@@ -12,20 +12,19 @@ import DeskArea from "@/apps/desktop/children/deskArea/DeskArea.vue"
 import {namespace} from "vuex-class"
 import {AppConfig} from "@/types/App"
 import {EmitEventType} from "@/types/Core"
+import {User} from "@/types/entity/User"
 
 const CoreModule = namespace("core")
-
+const UserModule = namespace("user")
 @Component({
-  components: {DeskArea, StatusBar}
+  components: { DeskArea, StatusBar}
 })
 export default class Desktop extends Vue {
   @CoreModule.State("runningList") runningList!: AppConfig[]
   @CoreModule.State("appList") appList!: AppConfig[]
+  @UserModule.State("user") user!: User|null
   @Prop() appConfig!: AppConfig
   @Provide() boot = (appName: string): void => this.$core.emit(EmitEventType.OPEN_APP, appName)
-
-
-
 }
 </script>
 

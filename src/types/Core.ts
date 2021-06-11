@@ -7,6 +7,8 @@ import textEditorConfig from "@/apps/textEditor/textEditor.config"
 import ImgViewerConfig from "@/apps/imgViewer/imgViewer.config"
 import audioPlayerConfig from "@/apps/audioPlayer/audioPlayer.config"
 import Vue from "vue"
+import yourChatConfig from "@/apps/yourChat/yourChat.config"
+import userManageConfig from "@/apps/userManage/userManage.config"
 
 
 export enum EmitEventType {
@@ -19,6 +21,7 @@ export enum EmitEventType {
   OPEN_FILE = "openFile",
   REGISTER = "register",
   SET_STYLE = "setStyle",
+  SET_USER = "setUser"
 }
 
 export enum SysEventType {
@@ -41,7 +44,9 @@ export class Core {
       computerConfig,
       textEditorConfig,
       ImgViewerConfig,
-      audioPlayerConfig
+      audioPlayerConfig,
+      yourChatConfig,
+      userManageConfig
     ]).then(() => {
       const autoBoot: AppConfig[] = store.state.core.appList.filter((app: AppConfig) => app.order !== undefined)
       autoBoot.sort((a: any, b: any) => a.order - b.order)
@@ -70,6 +75,8 @@ export class Core {
     this.eventBus.subscribe(eventType, callback, options)
   }
 
+
+  /*------------常用api-------------*/
   setStyle(vm: Vue, style: any): boolean {
     let ref = null
     while (vm && !ref) {
@@ -83,6 +90,7 @@ export class Core {
       return false
     }
   }
+
 
   constructor() {
     this.startUp()
@@ -118,6 +126,8 @@ class EmitEventHandler {
           return this.handleOpenFile(payload)
         case EmitEventType.REGISTER:
           return this.ok(store.dispatch("core/register", payload))
+        case EmitEventType.SET_USER:
+          return this.ok(store.dispatch("user/setUser", payload))
         default:
           return this.err("命令未找到")
       }
