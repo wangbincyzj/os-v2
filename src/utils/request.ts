@@ -2,11 +2,10 @@ import axios from "axios"
 import {RequestArgs} from "@/types/interface/requestArgs"
 import {Resp, RespList, RespPage} from "@/types/interface/response"
 import {Page} from "@/types/interface/page"
-//import { config } from "@/config/config"
+import  config from "@/config"
 import Vue from "vue"
-export const baseUrl =  "http://10.86.9.180:10086/domain"
 
-axios.defaults.baseURL = baseUrl
+axios.defaults.baseURL = config.baseUrl
 axios.defaults.timeout = 3000
 
 axios.interceptors.response.use(value => {

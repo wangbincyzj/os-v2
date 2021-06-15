@@ -1,5 +1,6 @@
-import {baseUrl, requests, RestRequest} from "@/utils/request"
+import {requests, RestRequest} from "@/utils/request"
 import {File} from "@/types/entity/File"
+import config from "@/config"
 
 class FileApi extends RestRequest<File>{
 
@@ -13,7 +14,7 @@ class FileApi extends RestRequest<File>{
 
   getUrl = (src: string) => requests.get(this.url + `/fileUrl/${src}`)
 
-  createStream = (src: string) =>  baseUrl + this.url + `/fileStream/${src}`
+  createStream = (src: string) =>  config.baseUrl + this.url + `/fileStream/${src}`
 }
 
 
