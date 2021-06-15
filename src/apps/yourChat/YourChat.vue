@@ -1,14 +1,24 @@
 <template>
-  <div class="w-full h-full bg-green-100 flex ">
-    <div class="list h-full bg-green-50">
-      <div class="flex" v-for="user in userList" :key="user.id">
-        <div class="avatar">
-          <img :src="avatar(user.avatar)" alt="">
-        </div>
-        <div class="info"></div>
+  <div class="w-full h-full bg-green-100 flex text-sm">
+    <template v-if="!user">
+      <div class="bg-white items-center w-full h-full flex flex-col justify-center">
+        <div class="text-gray-500">请先登录</div>
+        <el-button @click="handleLogin">登录</el-button>
       </div>
-    </div>
-    <div class="content h-full flex-1"></div>
+    </template>
+    <template v-else>
+      <div class="w-full h-full bg-green-100 flex ">
+        <div class="list h-full bg-green-50">
+          <div class="flex" v-for="user in userList" :key="user.id">
+            <div class="avatar">
+              <img :src="avatar(user.avatar)" alt="">
+            </div>
+            <div class="info"></div>
+          </div>
+        </div>
+        <div class="content h-full flex-1"></div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -19,6 +29,7 @@ import {namespace} from "vuex-class"
 import {User} from "@/types/entity/User"
 import {EventType, SocketPlus} from "@/types/SocketPlus"
 import {fileApi} from "@/apps/computer/api"
+import {EmitEventType} from "@/types/Core"
 
 const UserModule = namespace("user")
 
@@ -51,6 +62,9 @@ export default class YourChat extends Vue {
 
   mounted():void {
     this.init()
+  }
+  handleLogin():void {
+    this.$core.emit(EmitEventType.OPEN_APP, "userManage")
   }
 }
 </script>

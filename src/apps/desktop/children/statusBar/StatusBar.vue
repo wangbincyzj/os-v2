@@ -52,6 +52,6 @@ export default class StatusBar extends Vue {
 
 <style scoped lang="scss">
 .active{
-  background-color: coral;
+  background-color: lightpink;
 }
 </style>

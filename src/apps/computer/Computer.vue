@@ -98,7 +98,7 @@ export default class Computer extends AppComponent implements EventReceiver {
 
   handleAddText(): void {
     // todo
-    fileApi.add(createTextForm("", "新建文本文档", {} as File)).then(()=>{
+    fileApi.add(createTextForm("", "新建文本文档") as any).then(() => {
       this.refresh()
     })
   }
@@ -106,18 +106,25 @@ export default class Computer extends AppComponent implements EventReceiver {
   handleChooseFile(): void {
     const dom = document.createElement("input")
     dom.type = "file"
-    dom.onchange = e => {
-      const file = (e as any).target.files[0]
-      const fileName = file.name
-      const [name, ext] = parseFileName(fileName)
-      const form = new FormData()
-      form.set("name", name)
-      form.set("ext", ext as string)
-      form.set("file", file)
-      form.set("pid", this.currentRoute.id as any)
-      fileApi.newFile(form as any).then(() => {
+    dom.onchange = async e => {
+      const file_ = (e as any).target.files[0]
+      const [name, ext] = parseFileName(file_.name)
+      const service = this.$loading({background: "rgba(0,0,0,0.5)", text: "上传中..."})
+      try {
+        const ret = await fileApi.upload(file_)
+        const file = new File()
+        file.name = name
+        file.ext = ext
+        file.src = ret.msg
+        file.isDir = false
+        file.pid = this.currentRoute.id
+        await fileApi.add(file)
+      } catch (e) {
+        this.$message.error(e)
+      } finally {
+        service.close()
         this.fetchRouteData()
-      })
+      }
     }
     dom.click()
   }

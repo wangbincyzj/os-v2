@@ -14,11 +14,12 @@ import {EmitEventType} from "@/types/Core"
 import {File} from "@/types/entity/File"
 import {fileApi} from "@/apps/computer/api"
 import WIcon from "@/components/wIcon/WIcon.vue"
-import {createTextForm} from "@/utils/jsUtils"
+import {createTextFile} from "@/utils/jsUtils"
+
 @Component({
   components: {WIcon}
 })
-export default class TextEditor extends Vue implements EventReceiver{
+export default class TextEditor extends Vue implements EventReceiver {
   loading = false
   file: File = new File()
   text = ""
@@ -28,33 +29,45 @@ export default class TextEditor extends Vue implements EventReceiver{
     this.fetch()
   }
 
-  fetch():void {
+  fetch(): void {
     this.loading = true
-    fileApi.getStream(this.file?.src as string).then(ret=>{
+    fileApi.getStream(this.file?.src as string).then(ret => {
       this.text = ret as any
     }).finally(() => this.loading = false)
   }
 
-  handleSave():void {
-    if(!this.file.name){
-      this.$prompt("请输入文件名").then((ret: any)=>{
-        this.file = new File()
-        this.file.ext = "txt"
-        this.file.pid = 4
-        this.file.name = ret.value
-        fileApi.newFile(createTextForm(this.text, this.file.name, this.file) as any).then(ret=>{
-          this.file.id = ret.data
-          this.$message.success("新增成功")
-        })
+  async handleSave(): Promise<void> {
+    if (!this.file.name) {
+      this.$prompt("请输入文件名").then(async (ret: any) => {
+        let loading = this.$loading({background: "rgba(0,0,0,0.5)"})
+        try {
+          const file = createTextFile(this.text, ret.value)
+          const {msg: src} = await fileApi.upload(file)
+          this.file = new File()
+          this.file.ext = "txt"
+          this.file.pid = 4
+          this.file.name = ret.value
+          this.file.src = src
+          this.file.isDir = false
+          const ret2 = await fileApi.add(this.file)
+          this.file.id = ret2.data as any
+          this.$message.success("保存成功")
+        } catch (e) {
+          this.$message.error(e.toString())
+        } finally {
+          loading.close()
+        }
       })
-    }else{
-      fileApi.newFile(createTextForm(this.text, this.file.name, this.file) as any).then(()=>{
-        this.$message.success("保存成功")
-      })
+    } else {
+      let loading = this.$loading({background: "rgba(0,0,0,0.5)"})
+      const file = createTextFile(this.text, this.file.name)
+      const {msg: src} = await fileApi.upload(file, this.file.name)
+      this.file.src = src
+      await fileApi.update(this.file)
+      this.$message.success("保存成功")
+      loading.close()
     }
   }
-
-
 
 
   mounted(): void {
@@ -65,7 +78,7 @@ export default class TextEditor extends Vue implements EventReceiver{
 </script>
 
 <style scoped lang="scss">
-.input{
+.input {
   outline: none;
   line-height: 1em;
   resize: none;
