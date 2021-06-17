@@ -12,7 +12,11 @@ class FileApi extends RestRequest<File>{
   }
 
   add(data: File): Promise<Resp<File>> {
-    data.icon = getExtIcon(data.ext as string)
+    if(data.isDir){
+      data.icon = "icon-wenjianjia"
+    }else{
+      data.icon = getExtIcon(data.ext as string)
+    }
     return super.add(data)
   }
 
