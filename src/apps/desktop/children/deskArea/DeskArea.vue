@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1  flex flex-col items-start">
+  <div class="flex-1  flex flex-col items-start flex-wrap overflow-hidden content-start">
     <div v-for="app in desktopAppList" :key="app.schema"
          @dblclick="boot(app.name)"
          class="

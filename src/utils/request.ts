@@ -12,7 +12,7 @@ axios.interceptors.response.use(value => {
   const data = value.data
 
   // 这里是数据层报错
-  if (data.code !== 0) {
+  if (data.code && data.code !== 0) {
     Vue.prototype.$message.warning(data.msg)
     throw new Error(data.msg)
   }

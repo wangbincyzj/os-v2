@@ -1,3 +1,5 @@
+import {User} from "@/types/entity/User"
+
 export enum EventType {
   UPDATE = "update",
   P2P_MESSAGE = "p2pMessage"
@@ -7,7 +9,15 @@ export enum EventType {
 export interface ReceiveMessage {
   type: EventType,
   data: any,
-  from: number
+  from: User,
+  timestamp: number
+}
+
+export interface SendMessage{
+  type: EventType,
+  data: any,
+  to: number,
+  timestamp: number
 }
 
 export class SocketPlus {
@@ -17,6 +27,16 @@ export class SocketPlus {
   on = (event: EventType, callback: (msg: ReceiveMessage) => void) => {
     this.eventMap[event] = callback
   }
+
+  send = (to: number, content: string) => {
+    this.socket.send(JSON.stringify({to, data: content, type: EventType.P2P_MESSAGE}))
+  }
+
+  close = () => {
+    this.socket.close()
+  }
+
+
 
   constructor(socket: WebSocket) {
     this.socket = socket
