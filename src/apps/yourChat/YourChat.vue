@@ -8,6 +8,10 @@
     </template>
     <template v-else>
       <div class="w-full h-full  flex">
+        <!--左侧菜单-->
+        <div class="menu">
+
+        </div>
         <!--用户列表-->
         <div class="list h-full border-r bg-white">
           <div class="flex bg-white cursor-pointer  p-1" :class="{active: user.id===activeUser.id}" v-for="user in userList" :key="user.id"
