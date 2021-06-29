@@ -22,10 +22,12 @@ import ImgViewer from "@/apps/imgViewer/ImgViewer.vue"
 import AudioPlayer from "@/apps/audioPlayer/AudioPlayer.vue"
 import YourChat from "@/apps/yourChat/YourChat.vue"
 import UserManage from "@/apps/userManage/UserManage.vue"
+import BallGame from "@/apps/ballGame/BallGame.vue"
 
 
 @Component({
   components: {
+    BallGame,
     UserManage,
     YourChat, AudioPlayer, ImgViewer, TextEditor, AppBoxResize, AppBoxHead, Computer, Cmd, Desktop}
 })

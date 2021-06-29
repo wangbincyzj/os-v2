@@ -9,6 +9,7 @@ import audioPlayerConfig from "@/apps/audioPlayer/audioPlayer.config"
 import Vue from "vue"
 import yourChatConfig from "@/apps/yourChat/yourChat.config"
 import userManageConfig from "@/apps/userManage/userManage.config"
+import ballGameConfig from "@/apps/ballGame/ballGame.config"
 
 
 export enum EmitEventType {
@@ -46,7 +47,8 @@ export class Core {
       ImgViewerConfig,
       audioPlayerConfig,
       yourChatConfig,
-      userManageConfig
+      userManageConfig,
+      ballGameConfig
     ]).then(() => {
       const autoBoot: AppConfig[] = store.state.core.appList.filter((app: AppConfig) => app.order !== undefined)
       autoBoot.sort((a: any, b: any) => a.order - b.order)

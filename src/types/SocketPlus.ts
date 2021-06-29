@@ -36,6 +36,10 @@ export class SocketPlus {
     this.socket.close()
   }
 
+  getSocket(): WebSocket {
+    return this.socket
+  }
+
 
 
   constructor(socket: WebSocket) {
