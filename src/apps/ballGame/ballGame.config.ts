@@ -3,7 +3,7 @@ import {AppConfig} from "@/types/App"
 const ballGameConfig: AppConfig = {
   name: "ballGame",
   desktopName: "弹球",
-  iconName: "icon-liaotian",
+  iconName: "icon--game",
   windowMode: {
     mode: "FLOAT",
     appHead: true,

@@ -4,7 +4,7 @@ interface ExpiredData {
 }
 
 
-export const getStorage = (key: string): null | any => {
+export const getItem = (key: string): null | any => {
   const str = localStorage.getItem(key)
   if (!str) return null
   const obj: ExpiredData = JSON.parse(str)
@@ -17,8 +17,11 @@ export const getStorage = (key: string): null | any => {
 }
 
 
-export const setStorage = (key: string, data: any, expire?: number): void => {
+export const setItem = (key: string, data: any, expire?: number): void => {
   localStorage.setItem(key, JSON.stringify({
     data, expire
   }))
 }
+
+
+// export const

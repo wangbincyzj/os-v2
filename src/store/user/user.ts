@@ -1,5 +1,6 @@
 import {Module} from "vuex"
 import {User} from "@/types/entity/User"
+import {getItem, setItem} from "@/utils/storage"
 
 
 interface UserState {
@@ -10,12 +11,12 @@ interface UserState {
 const userModule: Module<UserState, any> = {
   namespaced: true,
   state: {
-    user: null
+    user: getItem("user") || null
   },
   mutations: {
     setUser(state, user:User):void {
       state.user = user
-      console.log(state.user)
+      setItem("user", user)
     }
   },
   actions: {

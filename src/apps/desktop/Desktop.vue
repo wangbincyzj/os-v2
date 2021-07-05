@@ -30,7 +30,7 @@ export default class Desktop extends Vue {
 
 <style scoped lang="scss">
 .desktop {
-  background: url("/bg.png") center;
+  //background: url("/bg.png") center;
   background-size: cover;
 }
 </style>

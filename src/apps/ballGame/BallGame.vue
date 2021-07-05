@@ -7,30 +7,54 @@
       </div>
     </template>
     <template v-else>
-      <template v-if="wait">
-        <div class="flex w-full h-full justify-center items-center">
-          <el-button @click="handleWait">开始匹配</el-button>
+      <div class="w-full h-full flex justify-center items-center">
+        <div class="status" v-if="state==='offLine'">
+          <div class="title">离线中</div>
+          <el-button @click="connectServer">连接服务器</el-button>
         </div>
-      </template>
-      <template v-if="!wait">
-        <div @keydown.right="handleMoveRight" class="container bg-white"
+        <div class="status" v-if="state==='onLine'">
+          <div class="title">已连接服务器</div>
+          <div>
+            <el-button @click="handleDisconnect">断开连接</el-button>
+            <el-button @click="handleMatch" type="primary">开始匹配</el-button>
+          </div>
+        </div>
+        <div class="status" v-if="state==='wait'">
+          <div class="title">寻找对手中...</div>
+          <div>
+            <el-button @click="handleDisconnect">断开连接</el-button>
+          </div>
+        </div>
+        <div class="status" v-if="state==='ready'">
+          <img :src="player.avatar" alt="">
+          <div>{{player.trueName}}</div>
+          <div class="title">已匹配对手</div>
+          <div>
+            <el-button @click="handleStart">开始比赛</el-button>
+          </div>
+        </div>
+
+        <div v-if="state==='playing'" class="container bg-white"
              :style="{width: `${vars.containerWidth}px`, height: `${vars.containerHeight}px`}">
           <div ref="ball" class="ball"
                :style="{left: `${p.x}px`, top: `${p.y}px`, width: `${vars.ballRadius*2}px`, height: `${vars.ballRadius*2}px`}"></div>
+          <div class="board board2"
+               :style="{width: `${vars.boardWidth}px`, height: `${vars.boardHeight}px`, right: `${board2.x}px`}"
+          ></div>
           <div ref="board" class="board"
                :style="{width: `${vars.boardWidth}px`, height: `${vars.boardHeight}px`, left: `${board.x}px`}"></div>
         </div>
-      </template>
+      </div>
 
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Vue, Watch} from "vue-property-decorator"
+import {Component, Vue} from "vue-property-decorator"
 import {namespace} from "vuex-class"
 import {User} from "@/types/entity/User"
-import {SocketPlus} from "@/types/SocketPlus"
+import {BallGameEventType, EventType, SocketPlus} from "@/types/SocketPlus"
 import {fileApi} from "@/apps/computer/api"
 import {EmitEventType} from "@/types/Core"
 import config from "@/config"
@@ -39,12 +63,11 @@ const UserModule = namespace("user")
 
 enum GameState {
   OFFLINE = "offLine",  // 离线未链接
-  ONLINE = "onLine",
-  WAIT = "wait",
-  READY = "ready",
-  PLAYING = "playing",
-  WIN = "win",
-  LOOSE = "loose"
+  ONLINE = "onLine",  // 在线未操作
+  WAIT = "wait",  // 排队中
+  READY = "ready",   // 已建立双向链接
+  PLAYING = "playing",  // 游戏中
+  END = "end",   // 游戏结束 => ONLINE
 }
 
 @Component
@@ -56,17 +79,10 @@ export default class YourChat extends Vue {
   }
   // 维护一个对面的状态和一个自己的状态
 
-
   @UserModule.State user!: User
 
-  @Watch("user", {immediate: true}) handleUser = (val: boolean) => {
-    if (val) {
-      this.init()
-    } else {
-      this.handleClose()
-    }
-  }
-  wait = true
+
+  state: GameState = GameState.OFFLINE
 
   activeUser: User = {} as User
 
@@ -76,15 +92,8 @@ export default class YourChat extends Vue {
     return fileApi.createStream(src)
   }
 
-  init(): void {
-    this.connectServer()
-  }
+  player!: User
 
-  // 开始匹配
-  handleWait(): void {
-    console.log(this.socket?.getSocket())
-    this.socket?.send(0, "start_match")
-  }
 
   start(): void {
     this.$nextTick(() => {
@@ -139,29 +148,90 @@ export default class YourChat extends Vue {
     }
   }
 
+  // 链接服务器
   connectServer(): void {
+    console.log("connect Server")
     const sp = new SocketPlus(new WebSocket(config.ballgameSocketUrl + `/${this.user.token}`,))
-    sp.on("match", msg => {
-      console.log("match", msg)
-    })
     this.socket = sp
+    sp.on(BallGameEventType.CONNECTED, () => {
+      console.log("connected")
+      this.state = GameState.ONLINE
+    })
+    sp.on(BallGameEventType.WAITING, () => {
+      console.log("等待中")
+      this.state = GameState.WAIT
+    })
+    sp.on(BallGameEventType.PLAYER_FOUND, (data: any) => {
+      console.log("已匹配对手")
+      this.player = data.data
+      this.state = GameState.READY
+    })
+    sp.on(EventType.P2P_MESSAGE, (data: any) => {
+      data = data.data
+      if (data.type === "start") {
+        this.v = data.v
+        this.p = data.p
+        console.log(data.v)
+        this.state = GameState.PLAYING
+        this.initGame()
+      } else if (data.type === "updatePosition") {
+        this.board2.x = data.x
+      } else if(data.type === "result"){
+        this.$message.success("你赢了")
+        this.state = GameState.READY
+        this.clearEffect()
+      }
+    })
+
   }
 
-  handleClose(): void {
-    this.socket?.close()
+  // 开始匹配
+  handleMatch(): void {
+    console.log("匹配开始")
+    this.socket?.send(0, {type: "match"})
   }
+
+
+  // 断开连接
+  handleDisconnect(): void {
+    console.log("断开连接")
+    this.state = GameState.OFFLINE
+    if (this.socket) {
+      this.socket.close()
+    }
+  }
+
+  // 开始比赛
+  handleStart(): void {
+    console.log("开始比赛")
+    this.state = GameState.PLAYING
+    this.initGame()
+    this.socket?.send(this.player.id, {type: "start",
+      v: {x: this.v.x * -1, y: -1 * this.v.y},
+      p: {x: this.vars.containerWidth - this.p.x, y: this.vars.containerHeight - this.p.y}
+    })
+  }
+
 
   beforeDestroy(): void {
-    this.handleClose()
+    this.handleDisconnect()
+    this.clearEffect()
+  }
+
+  clearEffect():void {
     clearInterval(this.timer)
     clearInterval(this.boardAddVTimer)
     clearInterval(this.boardTimer)
+    window.onkeydown = null
+    window.onkeyup = null
   }
 
   handleLogin(): void {
     this.$core.emit(EmitEventType.OPEN_APP, "userManage")
   }
 
+
+  // 数据相关
   vars = {
     containerWidth: 598,
     containerHeight: 766,
@@ -185,13 +255,17 @@ export default class YourChat extends Vue {
 
   // 球的位置
   p = {
-    x: 10,
-    y: 10,
+    x: 100,
+    y: 100,
   }
 
 
   // 板的位置
   board = {
+    x: 0
+  }
+
+  board2 = {
     x: 0
   }
 
@@ -205,7 +279,6 @@ export default class YourChat extends Vue {
     this.v.y = 1.05 * this.v.y
     this.v.x = 1.05 * this.v.x
   }
-
 
   handleMoveRight(): void {
     if (!this.boardAddVTimer) {
@@ -222,6 +295,61 @@ export default class YourChat extends Vue {
       this.boardAddVTimer = setInterval(() => {
         this.boardV.x -= 0.005
       }, 1)
+    }
+  }
+
+  initGame():void {
+    this.boardTimer = setInterval(() => {
+      this.board.x = this.board.x + this.boardV.x
+      console.log(this.boardV.x)
+      this.socket?.send(this.player.id, {x: this.board.x, type: "updatePosition"})
+    }, 2)
+    this.timer = setInterval(() => {
+      const {x: vx, y: vy} = this.v
+      const {x, y} = this.p
+      this.p = {
+        x: x + vx,
+        y: y + vy,
+      }
+      const vars = this.vars
+      if ((this.p.x - vars.ballRadius) <= 0) {
+        this.v.x = -this.v.x
+      }
+      if ((this.p.y - vars.ballRadius) <= vars.boardHeight) {
+        this.v.y = -this.v.y
+        this.addV()
+      }
+      if ((this.p.x + vars.ballRadius) >= vars.containerWidth) {
+        this.v.x = -this.v.x
+
+      }
+      const checkCondition = this.p.y + vars.ballRadius >= vars.containerHeight - vars.boardHeight
+      if (checkCondition) {
+        const success = this.board.x < this.p.x && this.p.x - this.board.x <= vars.boardWidth
+        if (success) {
+          this.v.y = -this.v.y
+          this.addV()
+        } else {  // 游戏结束
+          this.$message.info("你输了")
+          this.socket?.send(this.player.id, {type: "result"})
+          this.clearEffect()
+          this.state = GameState.READY
+        }
+      }
+    }, 8)
+
+    window.onkeydown = (ev: KeyboardEvent) => {
+      if (ev.key === "ArrowRight") {
+        this.handleMoveRight()
+      }
+      if (ev.key === "ArrowLeft") {
+        this.handleMoveLeft()
+      }
+    }
+    window.onkeyup = () => {
+      clearInterval(this.boardAddVTimer)
+      this.boardAddVTimer = null as any
+      this.boardV.x = 0
     }
   }
 }
@@ -269,8 +397,16 @@ export default class YourChat extends Vue {
     position: absolute;
     bottom: 0;
     background-color: orange;
-    width: 50px;
-    height: 10px;
   }
+  .board2{
+    top: 0;
+  }
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>

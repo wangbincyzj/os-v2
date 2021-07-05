@@ -66,7 +66,7 @@ import {User} from "@/types/entity/User"
 import {EventType, ReceiveMessage, SendMessage, SocketPlus} from "@/types/SocketPlus"
 import {fileApi} from "@/apps/computer/api"
 import {EmitEventType} from "@/types/Core"
-import {getStorage, setStorage} from "@/utils/storage"
+import {getItem, setItem} from "@/utils/storage"
 
 const UserModule = namespace("user")
 const MSG_STORAGE_KEY = "msgKey"
@@ -113,14 +113,14 @@ export default class YourChat extends Vue {
   }
 
   init(): void {
-    this.msgList = getStorage(MSG_STORAGE_KEY) || []
+    this.msgList = getItem(MSG_STORAGE_KEY) || []
     const socket = new SocketPlus(new WebSocket(config.socketUrl + `/${this.user.token}`,))
     socket.on(EventType.UPDATE, msg => {
       this.userList = msg.data
     })
     socket.on(EventType.P2P_MESSAGE, msg => {
       this.msgList.push(msg as any)
-      setStorage(MSG_STORAGE_KEY, this.msgList)
+      setItem(MSG_STORAGE_KEY, this.msgList)
       this.scrollToBottom()
     })
     this.socket = socket
@@ -155,7 +155,7 @@ export default class YourChat extends Vue {
       data: this.msg,
       timestamp: Date.now()
     } as any)
-    setStorage(MSG_STORAGE_KEY, this.msgList)
+    setItem(MSG_STORAGE_KEY, this.msgList)
     this.socket?.send(this.activeUser.id, this.msg)
     this.msg = ""
     this.scrollToBottom()
