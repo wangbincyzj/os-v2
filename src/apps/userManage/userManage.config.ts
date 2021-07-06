@@ -9,8 +9,8 @@ const userManageConfig: AppConfig = {
     appHead: true,
     width: "400px",
     height: "600px",
-    left: "0",
-    top: "0"
+    left: "600px",
+    top: "300px"
   },
   resize: false
 }

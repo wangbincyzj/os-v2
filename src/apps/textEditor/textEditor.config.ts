@@ -9,10 +9,11 @@ const textEditorConfig: AppConfig = {
     appHead: true,
     width: "800px",
     height: "500px",
-    left: "200px",
-    top: "100px"
+    left: "144px",
+    top: "140px"
   },
-  ext: ["txt", "md"]
+  ext: ["txt", "md"],
+  resize: true
 }
 
 export default textEditorConfig

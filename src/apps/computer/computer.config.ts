@@ -8,9 +8,10 @@ const computerConfig: AppConfig = {
     appHead: true,
     width: "800px",
     height: "500px",
-    left: "200px",
-    top: "100px"
-  }
+    left: "135px",
+    top: "135px",
+  },
+  resize: true
 }
 
 export default computerConfig

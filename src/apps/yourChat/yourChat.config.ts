@@ -9,8 +9,8 @@ const yourChatConfig: AppConfig = {
     appHead: true,
     width: "800px",
     height: "500px",
-    left: "200px",
-    top: "100px"
+    left: "400px",
+    top: "300px"
   },
   ext: ["txt", "md"]
 }

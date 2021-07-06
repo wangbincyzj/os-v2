@@ -39,7 +39,6 @@ export class SocketPlus {
   }
 
   send = (to: number, content: any, eventType?: EventType | BallGameEventType) => {
-    console.log({to, data: content, type: eventType || EventType.P2P_MESSAGE})
     this.socket.send(JSON.stringify({to, data: content, type: eventType || EventType.P2P_MESSAGE}))
   }
 

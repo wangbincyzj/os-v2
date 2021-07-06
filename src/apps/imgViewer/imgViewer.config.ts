@@ -9,10 +9,11 @@ const imgViewerConfig: AppConfig = {
     appHead: true,
     width: "800px",
     height: "500px",
-    left: "200px",
-    top: "100px"
+    left: "250px",
+    top: "124px"
   },
-  ext: ["png","jfif", "jpg"]
+  ext: ["png","jfif", "jpg"],
+  resize: true
 }
 
 export default imgViewerConfig
